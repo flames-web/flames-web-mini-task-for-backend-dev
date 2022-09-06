@@ -5,7 +5,7 @@ const {verifyToken,validateUser} = require('../../middleware');
 
 router.post('/register',validateUser,authController.register);
 
-router.get('/user',verifyToken,authController.registeredUser);
+router.get('/m',verifyToken,authController.registeredUser);
 
 router.post('/login',authController.login);
 

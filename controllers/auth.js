@@ -60,13 +60,13 @@ module.exports.login = async (req,res) => {
         const {email,password} = req.body;
         const user = await User.findOne({email});
         if(!user) {
-          return  res.status(404).send({message:'No User Found'})
+          return  res.status(404).send({message:'User with the provided email does not exist'})
         }
         const passwordIsValid = bcrypt.compareSync(password,user.password);
         if(!passwordIsValid){
          return   res.status(401).send({auth:false,token:null,message:'Email or password Incorrect'});
         }
-        const token = generateToken(user);
+        const token = generateToken(user);  
        res.status(200).send({auth:true,data:token})
     } catch (error) {
         res.status(error?.status || 500)
