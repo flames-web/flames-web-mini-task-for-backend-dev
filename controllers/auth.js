@@ -6,7 +6,7 @@ const {sendMail} = require('../services/mail');
 const {generateToken} = require('../services/jwt');
 const secret = 'olalekan';
 
-
+iujuuju
 module.exports.register = async (req,res) => {
     const {password,username,email} = req.body;
     try {
