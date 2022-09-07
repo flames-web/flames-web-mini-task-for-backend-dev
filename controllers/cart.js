@@ -47,3 +47,30 @@ module.exports.getAddCart = async (req,res) => {
            .send({message:error?.message || error,stack:error?.stack})
     }
 }
+
+module.exports.remove = async (req,res) => {
+    const {id} = req.params;
+    const {userId} = req;
+    const user = User.findById(userId);
+    let cart;
+    if(!user){
+        return res.status(400).send({message:'Verification failed'});        
+    }
+    cart = Cart.findOne({userId});
+    const item = await Item.findById(id);
+    const itemIndex = cart.items.findIndex(c => c.itemId == id);
+    if(itemIndex > -1){
+        cart.items[itemIndex].qty--;
+        cart.items[itemIndex].price = cart.items[itemIndex].qty * price;
+        cart.totalQty--;
+        cart.totalCost -= item.price
+    }else{
+        return res.status(400).send({status:'Not Found',message:'User cart doesnt exist'})
+    }
+    if(cart.items[itemIndex] <= 0){
+        await cart.items.remove({_id:cart.item[itemIndex]._id});
+    }
+    cart.userId  = userId;
+    await cart.save();
+    return res.status(200).send({status:'Ok',message:'Item sucessfully removed from cart'});
+}

@@ -7,4 +7,11 @@ module.exports.userSchema = joi.object({
     token:joi.string()
 })
 
+module.exports.itemSchema  = joi.object({
+    name:joi.string().min(4).required(),
+    description:joi.string().required(),
+    price:joi.number().min(1).required(),
+    unit:joi.number().min(1).required(),
+})
+
 // Minimum eight characters, at least one uppercase letter, one lowercase letter and one number

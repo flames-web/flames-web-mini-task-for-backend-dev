@@ -26,9 +26,7 @@ const userSchema = new Schema({
         type:String,
         required:true,
     },
-    otp:{
-        type:String,
-    },
+    all:otpSchema,
     token:{
         type:String,
     }

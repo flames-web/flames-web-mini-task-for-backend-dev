@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const {userSchema} = require('./schema');
+const {userSchema,itemSchema} = require('./schema');
 const secret = 'olalekan';
 
 module.exports.verifyToken = (req,res,next) => {
@@ -17,16 +17,31 @@ module.exports.verifyToken = (req,res,next) => {
     }
 }
 
-// module.exports.isLoggedIn  = (req,res,next)  => {
-//     try{
-
-//     }
-// }
 module.exports.validateUser = (req,res,next) => {
+   try {
     const {error} = userSchema.validate(req.body);
     if(error) {
        return res.status(error?.status || 400)
                  .send({message:error?.message || error}) 
     }
     next();
+
+   } catch(error) {
+    return res.status(error?.status || 500)
+              .send({message:error?.message || error})
+   }
+}
+
+module.exports.validateItem  = (req,res,next) => {
+    try {
+        const {error} = itemSchema.validate(req.body);
+        if(error) {
+            return res.status(error?.status || 400)
+                      .send({message:error?.message || error});
+        }
+        next();
+    } catch(error) {
+        res.status(error?.status || 500)
+           .send({message:error?.message});
+    }
 }
