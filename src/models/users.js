@@ -2,13 +2,13 @@ const mongoose = require('mongoose');
 const {Schema} = mongoose;
 
 const otpSchema = new Schema({
-    otp:{
-        type:Number,
+    code:{
+        type:String,
     },
     createdAt: {
         type: Date,
         default: Date.now,
-        expires:60*60*60,
+        expires:20,
     },
 })
 const opts = { toJSON: { virtuals: true } };
@@ -26,10 +26,7 @@ const userSchema = new Schema({
         type:String,
         required:true,
     },
-    all:otpSchema,
-    token:{
-        type:String,
-    }
+    otp:otpSchema,
 },opts);
 
 module.exports = mongoose.model('User',userSchema);

@@ -7,10 +7,9 @@ router.get('/',verifyToken,Item.getAllItems);
 
 router.post('/new',verifyToken,validateItem,Item.newItem);
 
-router.get('/:id',verifyToken,Item.getItem);
-
-router.put('/:id',verifyToken,Item.updateItem);
-
-router.delete('/:id',verifyToken,Item.deleteItem);
+router.route('/:id')
+   .get(verifyToken,Item.getItem)
+   .put(verifyToken,Item.updateItem)
+   .delete(verifyToken,Item.deleteItem)
 
 module.exports = router;

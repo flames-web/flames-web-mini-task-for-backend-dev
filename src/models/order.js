@@ -20,8 +20,8 @@ const orderSchema = new Schema({
       items: [
         {
           productId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Product",
+            type: Schema.Types.ObjectId,
+            ref: "Item",
           },
           qty: {
             type: Number,

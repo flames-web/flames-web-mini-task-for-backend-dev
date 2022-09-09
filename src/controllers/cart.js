@@ -65,12 +65,41 @@ module.exports.remove = async (req,res) => {
         cart.totalQty--;
         cart.totalCost -= item.price
     }else{
-        return res.status(400).send({status:'Not Found',message:'User cart doesnt exist'})
+        return res.status(400).send({status:false,status:'Not Found',message:'User cart doesnt exist'})
     }
     if(cart.items[itemIndex] <= 0){
         await cart.items.remove({_id:cart.item[itemIndex]._id});
     }
     cart.userId  = userId;
     await cart.save();
-    return res.status(200).send({status:'Ok',message:'Item sucessfully removed from cart'});
+    return res.status(200).send({status:true,message:'Item sucessfully removed from cart'});
+}
+
+module.exports.carts = async (req,res) => {
+   try{
+    const {userId} = req;
+    const carts = await Cart.findOne({userId});
+    if(!carts){
+        return res.status(400).send({status:false,message:'This user does to have any item availiable in its cart'});
+    }
+    return res.status(200).send({status:'OK',message:'User Cart',data:carts})
+   } catch(error) {
+    return res.status(error?.status || 500)
+              .send({message:error?.message || error});
+   }
+}
+
+module.exports.removeAllCarts = async (req,res) => {
+    try{
+        const {userId} = req;
+        const user = await User.findById(userId);
+        if(!user){
+            return res.status(400).send({status:false,message:'User does not exist'});
+        }
+        const cart = await Cart.findOneAndDelete({userId});
+        return res.status(200).send({status:true,message:'User cart sucessfully cleared'});
+    } catch (error) {
+        return res.status(error?.status || 500)
+                 .send({status:false,message:error?.message || error});
+    }
 }

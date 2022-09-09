@@ -7,7 +7,7 @@ router.post('/register',validateUser,authController.register);
 
 router.get('/m',verifyToken,authController.registeredUser);
 
-router.post('/login',authController.login);
+router.post('/login',validateUser,authController.login);
 
 router.post('/verifyToken',authController.verifyOtp);
 

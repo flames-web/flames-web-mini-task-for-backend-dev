@@ -8,8 +8,8 @@ const secret = 'olalekan';
 
 
 module.exports.register = async (req,res) => {
-    const {password,username,email} = req.body;
     try {
+        const {password,username,email} = req.body;
         const findByEmail = await User.findOne({email});
         const findByUsername =  await User.findOne({username});
         if(findByEmail){
@@ -19,25 +19,27 @@ module.exports.register = async (req,res) => {
             return res.status(419).send({message:'User with the given username exist'})
         }
         const hashedPassword = bcrypt.hashSync(req.body.password, 8);
-        const otp = generateOtp();
+        const code = generateOtp();
         const user = new User({
             password:hashedPassword,
             username,
             email,
-            otp
+            otp: {
+                code
+            }
         })
         try {
-            await sendMail(email,otp)
+            await sendMail(email,code)
         } catch (error) {
-            res.status(error?.status || 500)
+         return   res.status(error?.status || 500)
                .send({message:error?.message || error})
         }
         await user.save();
         const token = generateToken(user);
        res.status(200).send({auth:true,data:token})
        } catch (error) {
-           res.status(error?.status || 500)
-              .send({message:error?.message || error})
+         return  res.status(error?.status || 500)
+              .send({message:error?.message || error,error:error?.stack})
        }   
 }
 
@@ -50,7 +52,7 @@ module.exports.registeredUser = async (req,res) => {
         }
         return res.status(200).send({status:true,data:user})
     } catch (error) {
-        res.status(error?.staus || 500)
+      return  res.status(error?.staus || 500)
            .send({message:error?.message || error})         
     }    
 }
@@ -67,9 +69,9 @@ module.exports.login = async (req,res) => {
          return   res.status(401).send({auth:false,token:null,message:'Email or password Incorrect'});
         }
         const token = generateToken(user);  
-       res.status(200).send({auth:true,data:token})
+      return res.status(200).send({auth:true,data:token})
     } catch (error) {
-        res.status(error?.status || 500)
+      return  res.status(error?.status || 500)
            .send({message:error?.message || error});
     }
 }
@@ -84,14 +86,14 @@ module.exports.verifyOtp = async (req,res) => {
     if(user&&user.otp !== otp) {
       return res.status(400).send({message:'Invalid Otp'})
     }
-    res.status(200).send({status:'OK',message:'OTP verified sucessful'});
+    return  res.status(200).send({status:'OK',message:'OTP verified sucessful'});
 
    } catch(error) {
-    res.status(error?.status || 500)
+    return res.status(error?.status || 500)
        .send({message:error?.message || error})
    }
 }
 
 module.exports.logout = (req,res) => {
-    res.status(200).send({auth:false,token:null})
+  res.status(200).send({auth:false,token:null})
 }

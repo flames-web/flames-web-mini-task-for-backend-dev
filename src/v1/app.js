@@ -8,12 +8,12 @@ const bodyParser = require('body-parser');
 const methodOverride  = require('method-override');
 
 
-const authRouter = require('./v1/routes/auth');
-const resetRouter = require('./v1/routes/reset');
-const itemRouter = require('./v1/routes/item');
-const cartRouter = require('./v1/routes/cart');
-const userRouter = require('./v1/routes/user');
-const DB = require('./connectDB/database');
+const authRouter = require('./routes/auth');
+const resetRouter = require('./routes/reset');
+const itemRouter = require('./routes/item');
+const cartRouter = require('./routes/cart');
+const userRouter = require('./routes/user');
+const DB = require('../connectDB/database');
 
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
