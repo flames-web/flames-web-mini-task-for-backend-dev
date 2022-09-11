@@ -27,4 +27,3 @@ This way we will be able to interact and test your API
 
 Thank you very much for attempting to solve this challenge.
 Best of luck
-

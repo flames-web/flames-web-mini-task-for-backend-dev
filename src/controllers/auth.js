@@ -24,9 +24,6 @@ module.exports.register = async (req,res) => {
             password:hashedPassword,
             username,
             email,
-            otp: {
-                code
-            }
         })
         try {
             await sendMail(email,code)

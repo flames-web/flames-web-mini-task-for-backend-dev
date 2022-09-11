@@ -26,7 +26,10 @@ const userSchema = new Schema({
         type:String,
         required:true,
     },
-    otp:otpSchema,
+   otp:{
+     type:Schema.Types.ObjectId,
+     ref:'OTP'
+   }
 },opts);
 
 module.exports = mongoose.model('User',userSchema);

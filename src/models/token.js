@@ -1,13 +1,13 @@
 const mongoose = require('mongoose');
 const {Schema} = mongoose;
 
-const tokenSchema = new Schema({
+const otpSchema = new Schema({
     userId:{
         type:Schema.Types.ObjectId,
         required:true,
         ref:'User',
     },
-    token:{
+    otp:{
         type:String,
         required:true
     },
@@ -18,4 +18,4 @@ const tokenSchema = new Schema({
     }
 })
 
-module.exports = mongoose.model('Token',tokenSchema)
+module.exports = mongoose.model('OTP',otpSchema);

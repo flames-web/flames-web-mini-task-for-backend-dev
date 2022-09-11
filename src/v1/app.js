@@ -6,6 +6,7 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const methodOverride  = require('method-override');
+const payment = require('../../config/payments')
 
 
 const authRouter = require('./routes/auth');
@@ -13,7 +14,9 @@ const resetRouter = require('./routes/reset');
 const itemRouter = require('./routes/item');
 const cartRouter = require('./routes/cart');
 const userRouter = require('./routes/user');
+const paymentRouter = require('./routes/payment');
 const DB = require('../connectDB/database');
+
 
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
@@ -29,6 +32,7 @@ app.use('/v1/api/reset',resetRouter);
 app.use('/v1/api/items',itemRouter);
 app.use('/v1/api/cart',cartRouter);
 app.use('/v1/api/users',userRouter);
+app.use('/v1/api',paymentRouter);
 
 app.all('*', (req,res,next) => {
     res.status(404).send({status:false,message:'Page not found'});

@@ -2,8 +2,18 @@ const Item = require('../models/item');
 
 module.exports.getAllItems = async (req,res) => {
     try {
-        const items = await Item.find({});
-       return  res.status(200).send({staus:'OK',message:'All Items',data:{items},})
+        const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 0;
+        const page = req.query.page ? parseInt(req.query.page) : 0;
+        const total = await Item.find({});
+        const items = await Item.find({}).limit(pageSize).skip(pageSize * page);
+       return  res.status(200).send({staus:'OK',message:'All Items',data:{items,
+      meta:{
+        total:total.length,
+        skipped:pageSize * page,
+        perPage:pageSize,
+        page,
+      }
+    }})
     } catch (error) {
       return   res.status(error?.status || 500)
            .send({message:error?.message || error})
