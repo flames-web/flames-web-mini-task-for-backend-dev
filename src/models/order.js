@@ -32,11 +32,11 @@ const orderSchema = new Schema({
        default:0,
        required:true,
     },
-    userId: {
-       type:Schema.Types.ObjectId,
-       ref:'User',
-    }
   },
+  userId: {
+    type:Schema.Types.ObjectId,
+    ref:'User',
+ },
     address: {
       type: String,
       required: true,
@@ -54,3 +54,5 @@ const orderSchema = new Schema({
       default: false,
     },
 })
+
+module.exports = mongoose.model('Order',orderSchema)

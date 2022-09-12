@@ -33,7 +33,7 @@ module.exports.register = async (req,res) => {
         }
         await user.save();
         const token = generateToken(user);
-       res.status(200).send({auth:true,data:token})
+      return res.status(200).send({auth:true,data:token})
        } catch (error) {
          return  res.status(error?.status || 500)
               .send({message:error?.message || error,error:error?.stack})

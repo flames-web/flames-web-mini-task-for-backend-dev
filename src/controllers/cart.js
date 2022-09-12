@@ -13,33 +13,40 @@ module.exports.getAddCart = async (req,res) => {
         userCart = await Cart.findOne({userId});
     }
     let cart;
-    if(user && !userCart){
-        cart = await new Cart(req.session.cart);       
-    }else {
-      cart = userCart;
-    }
-    const item = await Item.findById(id);    
-    const itemIndex = cart.items.findIndex(p => p.itemId == id);
-    if(itemIndex > -1){
-        cart.items[itemIndex].qty++;
-        cart.items[itemIndex].price = cart.items[itemIndex].qty * item.price;
-        cart.totalQty++;
-        cart.totalCost += item.price;
-    }else {
-        cart.items.push({
-            itemId: id,
-            name:item.name,
-            qty:1,
-            price:item.price,
+    const item = await Item.findById(id);
+    if(userCart){
+        cart = userCart;
+        const itemIndex = cart.items.findIndex(p => p.itemId == id);
+        if(itemIndex > -1){
+            cart.items[itemIndex].qty++;
+            cart.items[itemIndex].price = cart.items[itemIndex].qty * item.price;
+            cart.totalQty++;
+            cart.totalCost += item.price}
+            else{
+                cart.items.push({
+                    itemId: id,
+                    name:item.name,
+                    qty:1,
+                    price:item.price,
+                });
+                cart.totalQty++;
+                cart.totalCost += item.price
+            }
+            cart.userId = user._id;
+            await cart.save();
+    }else{
+        cart =  Cart.create({
+            items:{
+                itemId: id,
+                name:item.name,
+                qty:1,
+                price:item.price,
+            },
+            totalQty : 1,
+            totalCost: item.price,
+            userId : user._id
         });
-        cart.totalQty++;
-        cart.totalCost += item.price
     }
-    if(user){
-        cart.userId = user._id;
-        await cart.save();
-    } 
-       req.session.cart = cart; 
        return  res.status(200).send({message:'Item sucessfully added to cart'});
 
     }catch(error){
@@ -49,30 +56,40 @@ module.exports.getAddCart = async (req,res) => {
 }
 
 module.exports.remove = async (req,res) => {
-    const {id} = req.params;
+    try {
+        const {id} = req.params;
     const {userId} = req;
     const user = User.findById(userId);
     let cart;
     if(!user){
         return res.status(400).send({message:'Verification failed'});        
     }
-    cart = Cart.findOne({userId});
+    cart = await Cart.findOne({userId});
+    if(!cart){
+        return res.status(400).send({status:false,status:'Not Found',message:'User cart doesnt exist'})
+    }
     const item = await Item.findById(id);
     const itemIndex = cart.items.findIndex(c => c.itemId == id);
     if(itemIndex > -1){
         cart.items[itemIndex].qty--;
-        cart.items[itemIndex].price = cart.items[itemIndex].qty * price;
+        cart.items[itemIndex].price = cart.items[itemIndex].qty * item.price;
         cart.totalQty--;
         cart.totalCost -= item.price
-    }else{
-        return res.status(400).send({status:false,status:'Not Found',message:'User cart doesnt exist'})
-    }
-    if(cart.items[itemIndex] <= 0){
-        await cart.items.remove({_id:cart.item[itemIndex]._id});
+        if (cart.items[itemIndex].qty <= 0) {
+            await cart.items.remove({ _id: cart.items[itemIndex]._id });
+          }
+        if (cart.totalQty <= 0) {
+            await Cart.findByIdAndRemove(cart._id);
+        }
     }
     cart.userId  = userId;
     await cart.save();
     return res.status(200).send({status:true,message:'Item sucessfully removed from cart'});
+
+    } catch (error) {
+        return res.status(error?.status || 500)
+                  .send({status:false,message:error?.message || error})
+    }
 }
 
 module.exports.carts = async (req,res) => {

@@ -5,8 +5,6 @@ if (process.env.NODE_ENV !== "production") {
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const methodOverride  = require('method-override');
-const payment = require('../../config/payments')
 
 
 const authRouter = require('./routes/auth');
@@ -15,12 +13,12 @@ const itemRouter = require('./routes/item');
 const cartRouter = require('./routes/cart');
 const userRouter = require('./routes/user');
 const paymentRouter = require('./routes/payment');
+const orderRouter = require('./routes/order');
 const DB = require('../connectDB/database');
 
 
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
-app.use(methodOverride('_method'));
 
 const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/task';
 
@@ -33,6 +31,7 @@ app.use('/v1/api/items',itemRouter);
 app.use('/v1/api/cart',cartRouter);
 app.use('/v1/api/users',userRouter);
 app.use('/v1/api',paymentRouter);
+app.use('/v1/api',orderRouter);
 
 app.all('*', (req,res,next) => {
     res.status(404).send({status:false,message:'Page not found'});
