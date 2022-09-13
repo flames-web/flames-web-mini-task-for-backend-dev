@@ -1,10 +1,9 @@
-const crypto  = require('crypto');
 const bcrypt = require('bcrypt');
 const { sendMail } = require('../services/mail');
 const {generateOtp} = require('../services/otp');
 const {generateToken} = require('../services/jwt')
 const User = require('../models/users');
-const Token = require('../models/token');
+const OTP = require('../models/otp');
 
 module.exports.postReset = async (req,res) => {
     try {
@@ -13,20 +12,21 @@ module.exports.postReset = async (req,res) => {
     if(!user) {
         return res.status(400).send({status:'Failed',messsage:'User with this given email doesnt exist'})
     }
-    let token = await Token.findOne({userId:user._id});
+    const code = generateOtp();
+    let otp = await OTP.findOne({userId:user._id});
     if(!token) {
-       token = new Token({
+       otp = new OTP({
          userId:user._id,
-         token:crypto.randomBytes(32).toString('hex'),
+         otp:code,
        })
        await token.save();
     }
     try{
       await sendMail({
         to:email,
-        subject:'Password Reset',
-        text:`${token.token}`,
-        html:`${token.token}`
+        subject:'OTP',
+        text:`${otp.otp}`,
+        html:`${otp.otp}`
     })
     }catch(error){
      return res.status(error?.status || 500).send({message:error?.message || 500})
@@ -39,17 +39,17 @@ module.exports.postReset = async (req,res) => {
     }
 }
 
-module.exports.postToken = async (req,res) => {
+module.exports.postOtp = async (req,res) => {
    try{
-    const {id,token} = req.params;
+    const {id,otp} = req.params;
     const {password} = req.body;
     const user = await User.findById(id);
     if(!user){
        return res.status(400).send({message:'User does not exist'});
     }
-    const foundToken = await Token.findOne({userId:user._id});
-    if(foundToken.token !== token){
-        return res.status(401).send({status:false,message:'Invalid Token'});
+    const foundOtp = await OTP.findOne({userId:user._id});
+    if(foundOtp.otp !== otp){
+        return res.status(401).send({status:false,message:'Invalid Otp provided'});
     }
     const hashedPassword = bcrypt.hashSync(password, 8);
     const updatedUser = await User.findByIdAndUpdate(id,{password:hashedPassword});

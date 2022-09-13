@@ -20,10 +20,15 @@ module.exports.register = async (req,res) => {
         }
         const hashedPassword = bcrypt.hashSync(req.body.password, 8);
         const code = generateOtp();
+        const otp = OTP.create({
+          otp:code,
+          userId : findByEmail._id || findByUsername._id,
+        })
         const user = new User({
             password:hashedPassword,
             username,
             email,
+            otp:otp._id,
         })
         try {
             await sendMail(email,code)

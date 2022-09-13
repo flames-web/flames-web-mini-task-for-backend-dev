@@ -5,6 +5,6 @@ const {validateUser} = require('../../middleware')
 
 router.post('/',validateUser,passwordReset.postReset);
 
-router.post('/:id/:token',passwordReset.postToken);
+router.post('/:id/:token',passwordReset.postOtp);
 
 module.exports = router;
